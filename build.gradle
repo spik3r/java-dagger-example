@@ -1,0 +1,84 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+project.ext.sourceCompatibility = JavaVersion.VERSION_1_8
+project.ext.targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    jcenter()
+}
+
+sourceSets {
+    dagger {
+        java {
+            srcDirs = ['src/dagger/java']
+        }
+    }
+}
+
+configurations {
+    compileDagger
+}
+
+compileJava {
+    description = "dagger annotation processor is loaded automatically from classpath"
+    sourceSets.dagger.java.srcDirs*.mkdirs()
+    classpath += configurations.compileDagger
+    options.compilerArgs += [
+            '-s', sourceSets.dagger.java.srcDirs.iterator().next()
+    ]
+}
+
+mainClassName = "griffio.MainApplication"
+
+clean {
+    description = "delete files in generated source directory tree"
+    delete fileTree(dir: sourceSets.dagger.java.srcDirs.iterator().next())
+}
+
+dependencies {
+
+    compile(
+            "com.google.dagger:dagger:2.10",
+            "joda-time:joda-time:2.9.9")
+
+    compileDagger(
+            "com.google.dagger:dagger-compiler:2.10")
+
+    testCompile(
+            "junit:junit:4.12",
+            "com.google.truth:truth:0.30"
+    )
+
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3.1'
+}
+
+//apply plugin: 'java'
+//apply plugin: 'com.neenbedankt.android-apt'
+//apply plugin: 'idea'
+//
+//sourceCompatibility = 1.8
+//
+//repositories {
+//    mavenCentral()
+//}
+//
+//buildscript {
+//    dependencies {
+//        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+//    }
+//}
+//
+//dependencies {
+//    testCompile group: 'junit', name: 'junit', version: '4.11'
+//    compile'joda-time:joda-time:2.9.9'
+//
+//    compile 'com.google.dagger:dagger:2.8'
+//    apt 'com.google.dagger:dagger-compiler:2.8'
+//
+//}
